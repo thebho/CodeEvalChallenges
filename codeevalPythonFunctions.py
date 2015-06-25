@@ -121,6 +121,7 @@ def recursively_add_friends(friend_dict: dict, friend_group: set, friends_availa
     """
 
     :rtype : set
+    :param local_groups_used: set of groups already sent to this level
     :param friend_dict: dictionary of Facebook_User objects
     :param friend_group: string keys for current friends in group
     :param friends_available: string keys for friends to try an add
@@ -153,6 +154,29 @@ def recursively_add_friends(friend_dict: dict, friend_group: set, friends_availa
     return friend_group
 
 
+def check_for_super_group(final_subset_test: list, current_group: set):
+    """
+   :rtype : bool
+   :param final_subset_test: list of previous final groups
+   :param current_group: current_group checking for super-set
+   :return: True if current_group is unique
+   """
+
+    # iterate over already final groups, to check for subset instances
+    for fi_g in final_subset_test:
+
+        # check if current set is subset of already added set
+        if current_group.issubset(fi_g):
+            return False
+
+    # is unique
+    return True
+
+
+
+#########      MAIN THREAD     ###########
+
+
 friends = ["Thu Dec 11 17:53:01 PST 2008    a@facebook.com    b@facebook.com",
            "Thu Dec 11 17:53:02 PST 2008    b@facebook.com    a@facebook.com",
            "Thu Dec 11 17:53:03 PST 2008    a@facebook.com    c@facebook.com",
@@ -179,7 +203,11 @@ for f in friends:
 
     # create friend objects if not already in friend_dict, and execute friend_action for friend1 and connects the two
     friend_interaction(friend1, friend2, friend_dict)
+
 friend_groups = []
+
+# creates a set of all the friend string keys so each friend won't be tried after the first time
+local_available = set(friend_dict.keys())
 
 for f, k in friend_dict.items():
 
@@ -188,9 +216,6 @@ for f, k in friend_dict.items():
 
     # adds current friend to that group
     local_group.add(f)
-
-    # creates a set of all the friend string keys so each friend won't be tried after the first time
-    local_available = set(friend_dict.keys())
 
     # removes current friend string
     local_available.remove(f)
@@ -207,29 +232,32 @@ for f, k in friend_dict.items():
             # append
             friend_groups.append(local_group)
 
+
+#########      REDUCING OUTPUTS     ###########
+
+# sort friend groups so largest groups are added first
+friend_groups.sort(key=lambda x: len(x), reverse=True)
+
 # empty list for adding final friend groups
 final_groups = []
+final_subset_test = []
+
 
 # iterate over valid groups
 for f_g in friend_groups:
 
-    # iterate over already final groups, to check for subset instances
-    for fi_g in final_groups:
+   if check_for_super_group(final_subset_test,f_g):
+        # adds group to subset test to check future groups
+        final_subset_test.append(f_g)
 
-        # check if current set is subset of already added set
-        if f_g.issubset(fi_g):
+        # convert friend group to list for sorting
+        f_list = list(f_g)
 
-            # break from final group iteration and skip adding to final_group if f_g is a subset of a final group set
-            break
+        # sort friend list
+        f_list.sort()
 
-    # convert friend group to list for sorting
-    f_list = list(f_g)
-
-    # sort friend list
-    f_list.sort()
-
-    # add sorted friend group email names as strings to final group list
-    final_groups.append(", ".join(f for f in f_list))
+        # add sorted friend group email names as strings to final group list
+        final_groups.append(", ".join(f for f in f_list))
 
 # sort final group
 final_groups.sort()
