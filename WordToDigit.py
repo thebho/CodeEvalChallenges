@@ -13,7 +13,7 @@ def word_to_digit(word_string, starting_index):
     :param starting_index: Index of string to convert
     :return: String numeric digit
     """
-    print(starting_index)
+    #print(starting_index)
 
     if word_string[starting_index] == 'z':
         return "0"
@@ -43,10 +43,15 @@ for t in test_cases:
     word_index = 0
     ans = ""
     while True:
+
+        # concatenate ans string
         ans += word_to_digit(t, word_index)
+
+        # increment the word_index to the char after the next ';'
         word_index = t.find(";", word_index + 1) + 1
+
+        # if there isn't a next ';'
         if word_index == 0:
             break
-
 
     print(ans)
