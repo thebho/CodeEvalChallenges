@@ -8,8 +8,6 @@ test_cases = ["Feb 2004-Dec 2009; Sep 2004-Jul 2008",
               "Apr 1992-Dec 1993; Feb 1996-Sep 1997; Jan 2002-Jun 2002; Sep 2003-Apr 2004; Feb 2010-Nov 2011",
               "Feb 2004-May 2004; Jun 2004-Jul 2004"]
 
-
-
 def update_job_dict(job_dict, job):
     for year in job.active_years:
         if year not in job_dict:
